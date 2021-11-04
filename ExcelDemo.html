@@ -10,12 +10,25 @@
         .btnStyle {
             background-color: orange;
         }
+
+        .errorStyle {
+            color: red;
+        }
     </style>
 </head>
 
 <body>
     <div id="Excel">
-        <input class="btnStyle" type="button" value="按我" @click="downloadExcel">
+        <div>
+            <label>檔名:</label>
+            <input type="text" v-model="fileName">
+        </div>
+        <div>
+            <label>頁籤:</label>
+            <input type="text" v-model="sheetName">
+            <input class="btnStyle" type="button" value="按我" @click="downloadExcel">
+        </div>
+        <div class="errorStyle" v-if="isError">{{errorMessage}}</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
@@ -25,27 +38,41 @@
         var VueApp = new Vue({
             el: '#Excel',
             data: {
-
+                fileName: '',
+                sheetName: '',
+                errorMessage: '',
+                isError: false
             },
             methods: {
                 downloadExcel: function () {
-                    console.log("你好");                   
+                    console.log("你好");
                     var _self = this;
+                    _self.errorMessage = "";
+                    _self.isError = false;
+                    if (_self.fileName === '') { _self.errorMessage = "請輸入檔名"; _self.isError = true; return; }
+                    if (_self.sheetName === '') { _self.errorMessage = "請輸入頁籤名稱"; _self.isError = true; return; }
+                    //資料內容
                     const data = [
                         ['姓名', '電話', '年齡', '地址'],
                         ['AAA', 123456789, 18, 'xx省oo縣'],
                         ['BBB', 789456123, 20, 'cc省rr縣'],
                         ['CCC', 741852963, 25, 'hh省zz縣'],
                     ];
+
+                    //組資料
                     const sheet = XLSX.utils.aoa_to_sheet(data);
+
                     const workbook = new Workbook();
+                    //生成Sheet頁籤
                     workbook.appendSheet(sheet, 'sheet_name_1');
-                    saveAs(workbook.toBlob(), `workbook_name.xlsx`);
+                    //匯出檔案
+                    saveAs(workbook.toBlob(), _self.fileName + `.xls`);
                 }
 
             }
         })
 
+        //這邊不慣管它直接使用
         class Workbook {
             constructor() {
                 // 使用單例模式，產生唯一的 workbook
@@ -57,7 +84,7 @@
 
                 // 自定義 workbook optional object。
                 this.wopts = {
-                    bookType: 'xlsx', // 要生成的文件类型
+                    bookType: 'xls', // 要生成的文件类型
                     bookSST: false,   // 是否生成 Shared String Table。官方解釋是如果開啟生成速度會下降，但在低版本IOS設備上有更好的兼容性
                     type: 'binary'
                 };
