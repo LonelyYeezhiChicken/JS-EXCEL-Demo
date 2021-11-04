@@ -29,7 +29,7 @@
             },
             methods: {
                 downloadExcel: function () {
-                    console.log("你好");
+                    console.log("你好");                   
                     var _self = this;
                     const data = [
                         ['姓名', '電話', '年齡', '地址'],
@@ -40,7 +40,7 @@
                     const sheet = XLSX.utils.aoa_to_sheet(data);
                     const workbook = new Workbook();
                     workbook.appendSheet(sheet, 'sheet_name_1');
-                    FileSaver.saveAs(workbook.toBlob(), 'workbook_name.xlsx');
+                    saveAs(workbook.toBlob(), `workbook_name.xlsx`);
                 }
 
             }
